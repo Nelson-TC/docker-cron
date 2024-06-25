@@ -20,6 +20,9 @@ COPY . /var/www
 # Set composer to allow super user
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php
+
 # Install the Laravel app dependencies
 RUN composer install
 

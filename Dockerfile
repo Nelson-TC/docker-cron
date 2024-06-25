@@ -13,6 +13,8 @@ RUN apt-get update \
 # Set the working directory for the Laravel app
 WORKDIR /var/www
 
+RUN ls -la
+
 # Copy composer files first to leverage Docker cache
 COPY composer.json composer.lock ./
 

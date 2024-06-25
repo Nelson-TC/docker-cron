@@ -16,6 +16,9 @@ WORKDIR /var/www
 # Copy the Laravel app into the container
 COPY . /var/www
 
+# Set the composer superuser
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
 # Install the Laravel app dependencies
 RUN composer install
 

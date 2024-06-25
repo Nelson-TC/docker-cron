@@ -13,6 +13,8 @@ RUN apt-get update \
 # Set the working directory for the Laravel app
 WORKDIR /var/www
 
+RUN ls -la
+
 # Copy the Laravel app into the container
 COPY . /var/www
 

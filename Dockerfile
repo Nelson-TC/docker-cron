@@ -21,18 +21,18 @@ COPY . /var/www
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # Install the Laravel app dependencies
-RUN composer install
+RUN composer install --no-scripts --no-autoloader
 
 # Set proper permissions for the storage and bootstrap/cache directories
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
     && chmod -R 755 /var/www/storage /var/www/bootstrap/cache
 
 # Copy the crontab file and entrypoint script into the container
-COPY crontab /hello-cron
+COPY crontab /etc/cron.d/hello-cron
 COPY entrypoint.sh /entrypoint.sh
 
 # Install the crontab and make the entrypoint script executable
-RUN crontab /hello-cron \
+RUN crontab /etc/cron.d/hello-cron \
     && chmod +x /entrypoint.sh
 
 # Run the entrypoint script

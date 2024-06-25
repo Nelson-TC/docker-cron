@@ -9,13 +9,16 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && docker-php-ext-install pdo pdo_mysql \
     # Install Composer
-    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    && curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php
 
 # Set the working directory for the Laravel app
 WORKDIR /var/www
 
+# Print the files to make sure that the composer exists
+RUN ls -la
+
 # Copy the Laravel app into the container
-COPY composer.json composer.lock /var/www/
+COPY . /var/www/
 
 # Set composer to allow super user
 ENV COMPOSER_ALLOW_SUPERUSER=1

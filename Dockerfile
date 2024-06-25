@@ -1,4 +1,3 @@
-
 # Use the official PHP image as the base image
 FROM php:8.0-fpm
 
@@ -9,33 +8,27 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && docker-php-ext-install pdo pdo_mysql \
     # Install Composer
-    && curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php
+    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Set the working directory for the Laravel app
-WORKDIR /var/www/html
-
-# Print the files to make sure that the composer exists
-RUN ls -la
+WORKDIR /var/www
 
 # Copy the Laravel app into the container
 COPY . /var/www
 
-# Set composer to allow super user
-ENV COMPOSER_ALLOW_SUPERUSER=1
-
 # Install the Laravel app dependencies
-RUN composer install --no-scripts --no-autoloader
+RUN composer install
 
 # Set proper permissions for the storage and bootstrap/cache directories
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
     && chmod -R 755 /var/www/storage /var/www/bootstrap/cache
 
 # Copy the crontab file and entrypoint script into the container
-COPY crontab /etc/cron.d/hello-cron
+COPY crontab /hello-cron
 COPY entrypoint.sh /entrypoint.sh
 
 # Install the crontab and make the entrypoint script executable
-RUN crontab /etc/cron.d/hello-cron \
+RUN crontab /hello-cron \
     && chmod +x /entrypoint.sh
 
 # Run the entrypoint script

@@ -15,7 +15,7 @@ RUN apt-get update \
 WORKDIR /var/www
 
 # Copy the Laravel app into the container
-COPY . /var/www
+COPY composer.json composer.lock /var/www/
 
 # Set composer to allow super user
 ENV COMPOSER_ALLOW_SUPERUSER=1

@@ -13,22 +13,30 @@ RUN apt-get update \
 # Set the working directory for the Laravel app
 WORKDIR /var/www
 
-# Copy the Laravel app into the container
-COPY . /var/www
+# Copy composer files first to leverage Docker cache
+COPY composer.json composer.lock ./
 
 # Install the Laravel app dependencies
-RUN composer install
+ENV COMPOSER_ALLOW_SUPERUSER=1
+RUN composer install --no-scripts --no-autoloader
+
+# Copy the rest of the Laravel app into the container
+COPY . .
+
+# Generate autoloader and run scripts
+RUN composer dump-autoload --optimize && composer run-script post-install-cmd
 
 # Set proper permissions for the storage and bootstrap/cache directories
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
-    && chmod -R 755 /var/www/storage /var/www/bootstrap/cache
+RUN chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 755 storage bootstrap/cache
 
 # Copy the crontab file and entrypoint script into the container
-COPY crontab /hello-cron
+COPY crontab /etc/cron.d/laravel-cron
 COPY entrypoint.sh /entrypoint.sh
 
 # Install the crontab and make the entrypoint script executable
-RUN crontab /hello-cron \
+RUN chmod 0644 /etc/cron.d/laravel-cron \
+    && crontab /etc/cron.d/laravel-cron \
     && chmod +x /entrypoint.sh
 
 # Run the entrypoint script
@@ -36,5 +44,5 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 # https://manpages.ubuntu.com/manpages/trusty/man8/cron.8.html
 # -f | Stay in foreground mode, don't daemonize.
-# -L loglevel | Tell  cron  what to log about jobs (errors are logged regardless of this value) as the sum of the following values:
+# -L loglevel | Tell cron what to log about jobs (errors are logged regardless of this value) as the sum of the following values:
 CMD ["cron", "-f", "-L", "2"]

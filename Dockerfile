@@ -12,10 +12,10 @@ RUN apt-get update \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Set the working directory for the Laravel app
-WORKDIR /var/www
+WORKDIR /var/www/temalan
 
 # Copy the Laravel app into the container
-COPY . /var/www
+COPY . /var/www/temalan
 
 # Set composer to allow super user
 ENV COMPOSER_ALLOW_SUPERUSER=1
